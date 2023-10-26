@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 
 public class Deck : MonoBehaviour {
@@ -19,11 +18,11 @@ public class Deck : MonoBehaviour {
 	public Sprite cardFront;
 	public Sprite cardFrontGold;
 
-	public bool startFaceUp = true;
 	
-	
-	// Prefabs
-	public GameObject prefabSprite;
+    public bool startFaceUp = false;
+
+    // Prefabs
+    public GameObject prefabSprite;
 	public GameObject prefabCard;
 
 	[Header("Set Dynamically")]
@@ -310,8 +309,10 @@ public class Deck : MonoBehaviour {
 	 	//because oCards is a ref parameter, the changes made are propogated back
 	 	//for ref paramters changes made in the function persist.
 
-
-	 }
+		
+   	
+    
+}
 
 
 } // Deck class

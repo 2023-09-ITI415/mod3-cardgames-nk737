@@ -1,4 +1,4 @@
-using System.Collections;
+
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -22,7 +22,7 @@ public class Layout : MonoBehaviour
     public PT_XMLHashtable xml;
     public Vector2 multiplier;
     public List<SlotDef> slotDefs;
-    public SlotDef drawpile;
+    public SlotDef drawPile;
     public SlotDef discardPile;
     public string[] sortingLayerNames = new string[] { "Row0" , "Row1","Row2","Row3",
     "Discard", "Draw"};
@@ -36,6 +36,50 @@ public class Layout : MonoBehaviour
         multiplier.x = float.Parse(xml["muliplier"][0].att("x"));
         multiplier.y = float.Parse(xml["muliplier"][0].att("y"));
 
+        SlotDef tSD;
+        PT_XMLHashList slotsX = xml["slot"];
 
+        for (int i = 0; i < slotsX.Count; i++)
+        {
+            tSD = new SlotDef();
+            if (slotsX[i].HasAtt("type"))
+            {
+                tSD.type = slotsX[i].att("type");
+            }
+            else
+            {
+                tSD.type = "slot";
+            }
+            tSD.x = float.Parse(slotsX[i].att("x"));
+            tSD.y = float.Parse(slotsX[i].att("y"));
+            tSD.layerID = int.Parse(slotsX[i].att("layer"));
+            //	This	converts	the	number	of	the	layerID	into	a	text	layerName	
+            tSD.layerName = sortingLayerNames[tSD.layerID]; //	a	
+            switch (tSD.type)
+            {
+                //	pull	additional	attributes	based	on	the	type	of	this	<slot>	
+                case "slot":
+                    tSD.faceUp = (slotsX[i].att("faceup") == "1");
+                    tSD.id = int.Parse(slotsX[i].att("id"));
+                    if (slotsX[i].HasAtt("hiddenby"))
+                    {
+                        string[] hiding = slotsX[i].att("hiddenby").Split(',');
+                        foreach (string s in hiding)
+                        {
+                            tSD.hiddenBy.Add(int.Parse(s));
+                        }
+                    }
+                    slotDefs.Add(tSD);
+                    break;
+                case "drawpile":
+                    tSD.stagger.x = float.Parse(slotsX[i].att("xstagger"));
+                    drawPile = tSD;
+                    break;
+                case "discardpile":
+                    discardPile = tSD;
+                    break;
+            }
+
+            }
     }
 }
