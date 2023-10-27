@@ -382,8 +382,7 @@ MonoBehaviour:
   - {fileID: 0}
   layoutAnchor: {fileID: 0}
   target: {fileID: 0}
-  tableau:
-  - {fileID: 0}
+  tableau: []
   discardPile:
   - {fileID: 0}
 --- !u!114 &827460516

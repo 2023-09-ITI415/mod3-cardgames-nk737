@@ -21,7 +21,7 @@ public class Prospector : MonoBehaviour
     public List<CardProspector> drawPile;
     public Transform layoutAnchor;
     public CardProspector target;
-    public List<CardProspector> tableau;
+    [SerializeField] private List<CardProspector> tableau;
     public List<CardProspector> discardPile;
 
     void Awake()
@@ -117,21 +117,31 @@ public class Prospector : MonoBehaviour
         //	Set	up	the	Draw	pile	
         UpdateDrawPile();
         //	Convert	from	the	layoutID	int	to	the	CardProspector	with	that	ID	
-        CardProspector FindCardByLayoutID(int layoutID)
-        {
-            foreach (CardProspector tCP in tableau)
-            {
-                //	Search	through	all	cards	in	the	tableau	List<>	
-                if (tCP.layoutID == layoutID)
-                {
-                    //	If	the	card	has	the	same	ID,	return	it	
-                    return (tCP);
-                }
-            }
-            //	If	it's	not	found,	return	null	
-            return (null);
-        }
+       
     }
+
+    CardProspector FindCardByLayoutID(int layoutID)
+    {
+        foreach (CardProspector tCP in tableau)
+        {
+            //	Search	through	all	cards	in	the	tableau	List<>	
+            if (tCP.layoutID == layoutID)
+            {
+                //	If	the	card	has	the	same	ID,	return	it	
+                return (tCP);
+            }
+        }
+        //	If	it's	not	found,	return	null	
+        return (null);
+    }
+
+
+
+
+
+
+
+
 
     //	Moves	the	current	target	to	the	discardPile	
     void MoveToDiscard(CardProspector cd)
