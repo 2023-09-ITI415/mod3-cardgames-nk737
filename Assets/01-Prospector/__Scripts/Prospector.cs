@@ -21,7 +21,7 @@ public class Prospector : MonoBehaviour
     public List<CardProspector> drawPile;
     public Transform layoutAnchor;
     public CardProspector target;
-    [SerializeField] private List<CardProspector> tableau;
+    public List<CardProspector> tableau;
     public List<CardProspector> discardPile;
 
     void Awake()
