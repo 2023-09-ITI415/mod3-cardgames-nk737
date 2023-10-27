@@ -15,6 +15,8 @@ public class Card : MonoBehaviour {
 	public GameObject back;  // back of card;
 	public CardDefinition def;  // from DeckXML.xml		
     public SpriteRenderer[] spriteRenderers;
+
+
     //	If	spriteRenderers	is	not	yet	defined,	this	function	defines	it	
     public void PopulateSpriteRenderers()
     {

@@ -1,5 +1,6 @@
 
 using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 
 [System.Serializable]
@@ -32,9 +33,9 @@ public class Layout : MonoBehaviour
         xmlr = new PT_XMLReader();
         xmlr.Parse(xmlText);
         xml = xmlr.xml["xml"][0];
-
-        multiplier.x = float.Parse(xml["muliplier"][0].att("x"));
-        multiplier.y = float.Parse(xml["muliplier"][0].att("y"));
+        // Read in the multiplier, which sets card spacing 
+        multiplier.x = float.Parse(xml["multiplier"][0].att("x"));
+        multiplier.y = float.Parse(xml["multiplier"][0].att("y"));
 
         SlotDef tSD;
         PT_XMLHashList slotsX = xml["slot"];

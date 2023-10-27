@@ -290,7 +290,8 @@ public class Deck : MonoBehaviour {
      /// </summary>
      /// <param name="oCards">reference to a List of Card object. Passed by reference, the original order of
      /// the list will be changed upon exiting the function</param>
-	 static public void Shuffle(ref List<Card> oCards)
+	
+	static public void Shuffle(ref List<Card> oCards)
 	 {
 	 	List<Card> tCards = new List<Card>();
 

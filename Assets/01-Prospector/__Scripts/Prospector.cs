@@ -59,6 +59,7 @@ public class Prospector : MonoBehaviour
         }
         return (lCP);
     }
+
     //	The	Draw	function	will	pull	a	single	card	from	the	drawPile	andreturn	it
     CardProspector Draw()
     {
@@ -83,6 +84,10 @@ public class Prospector : MonoBehaviour
         {
             //	^	Iterate	through	all	the	SlotDefs	in	the	layout.slotDefs	as	tSD	
             cp = Draw();    //	Pull	a	card	from	the	top	(beginning)	of	the	draw	Pile	
+            
+            if (cp == null) Debug.Log("cp is null");
+            if (tSD == null) Debug.Log("tsD is null");
+
             cp.faceUp = tSD.faceUp; //	Set	its	faceUp	to	the	value	in	SlotDef	
             cp.transform.parent = layoutAnchor; //	Make	its	parent	layoutAnchor	
                                                 //	This	replaces	the	previous	parent:	deck.deckAnchor,	which	
@@ -278,7 +283,7 @@ public class Prospector : MonoBehaviour
             }
         }
 
-    private void SetTableauFaces()
+    void SetTableauFaces()
     {
         throw new NotImplementedException();
     }
