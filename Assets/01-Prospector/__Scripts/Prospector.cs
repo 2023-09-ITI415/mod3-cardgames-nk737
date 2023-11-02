@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class Prospector : MonoBehaviour
@@ -31,6 +30,8 @@ public class Prospector : MonoBehaviour
     public List<CardProspector> tableau;
     public List<CardProspector> discardPile;
     public FloatingScore fsRun;
+
+    public object V { get; private set; }
 
     void Awake()
     {
@@ -125,7 +126,7 @@ public class Prospector : MonoBehaviour
         {
             //	^	Iterate	through	all	the	SlotDefs	in	the	layout.slotDefs	as	tSD	
             cp = Draw();    //	Pull	a	card	from	the	top	(beginning)	of	the	draw	Pile	
-            
+
             if (cp == null) Debug.Log("cp is null");
             if (tSD == null) Debug.Log("tsD is null");
 
@@ -158,7 +159,7 @@ public class Prospector : MonoBehaviour
         //	Set	up	the	Draw	pile	
         UpdateDrawPile();
         //	Convert	from	the	layoutID	int	to	the	CardProspector	with	that	ID	
-       
+
     }
 
     CardProspector FindCardByLayoutID(int layoutID)
@@ -186,61 +187,61 @@ public class Prospector : MonoBehaviour
 
     //	Moves	the	current	target	to	the	discardPile	
     void MoveToDiscard(CardProspector cd)
+    {
+        //	Set	the	state	of	the	card	to	discard	
+        cd.state = eCardState.discard;
+        discardPile.Add(cd);    //	Add	it	to	the	discardPile	List<>	
+        cd.transform.parent = layoutAnchor; //	Update	its	transform	parent	
+                                            //	Position	this	card	on	the	discardPile	
+        cd.transform.localPosition = new Vector3(
+        layout.multiplier.x * layout.discardPile.x,
+        layout.multiplier.y * layout.discardPile.y, -layout.discardPile.layerID + 0.5f);
+        cd.faceUp = true;
+        //	Place	it	on	top	of	the	pile	for	depth	sorting	
+        cd.SetSortingLayerName(layout.discardPile.layerName);
+        cd.SetSortOrder(-100 + discardPile.Count);
+    }
+
+
+
+    //	Make	cd	the	new	target	card	
+    void MoveToTarget(CardProspector cd)
+    {
+        //	If	there	is	currently	a	target	card,	move	it	to	discardPile	
+        if (target != null) MoveToDiscard(target);
+        target = cd;    //	cd	is	the	new	target	
+        cd.state = eCardState.target;
+        cd.transform.parent = layoutAnchor;
+        //	Move	to	the	target	position	
+        cd.transform.localPosition = new Vector3(
+        layout.multiplier.x * layout.discardPile.x,
+        layout.multiplier.y * layout.discardPile.y, -layout.discardPile.layerID);
+        cd.faceUp = true;   //	Make	it	face-up	
+                            //	Set	the	depth	sorting	
+        cd.SetSortingLayerName(layout.discardPile.layerName);
+        cd.SetSortOrder(0);
+    }
+
+    //	Arranges	all	the	cards	of	the	drawPile	to	show	how	many	are	left	
+    void UpdateDrawPile()
+    {
+        CardProspector cd;
+        //	Go	through	all	the	cards	of	the	drawPile	
+        for (int i = 0; i < drawPile.Count; i++)
         {
-            //	Set	the	state	of	the	card	to	discard	
-            cd.state = eCardState.discard;
-            discardPile.Add(cd);    //	Add	it	to	the	discardPile	List<>	
-            cd.transform.parent = layoutAnchor; //	Update	its	transform	parent	
-                                                //	Position	this	card	on	the	discardPile	
-            cd.transform.localPosition = new Vector3(
-            layout.multiplier.x * layout.discardPile.x,
-            layout.multiplier.y * layout.discardPile.y, -layout.discardPile.layerID + 0.5f);
-            cd.faceUp = true;
-            //	Place	it	on	top	of	the	pile	for	depth	sorting	
-            cd.SetSortingLayerName(layout.discardPile.layerName);
-            cd.SetSortOrder(-100 + discardPile.Count);
-        }
-
-
-
-        //	Make	cd	the	new	target	card	
-        void MoveToTarget(CardProspector cd)
-        {
-            //	If	there	is	currently	a	target	card,	move	it	to	discardPile	
-            if (target != null) MoveToDiscard(target);
-            target = cd;    //	cd	is	the	new	target	
-            cd.state = eCardState.target;
+            cd = drawPile[i];
             cd.transform.parent = layoutAnchor;
-            //	Move	to	the	target	position	
+
+            //	Position	it	correctly	with	the	layout.drawPile.stagger	
+            Vector2 dpStagger = layout.drawPile.stagger;
             cd.transform.localPosition = new Vector3(
-            layout.multiplier.x * layout.discardPile.x,
-            layout.multiplier.y * layout.discardPile.y, -layout.discardPile.layerID);
-            cd.faceUp = true;   //	Make	it	face-up	
-                                //	Set	the	depth	sorting	
-            cd.SetSortingLayerName(layout.discardPile.layerName);
-            cd.SetSortOrder(0);
-        }
-
-        //	Arranges	all	the	cards	of	the	drawPile	to	show	how	many	are	left	
-        void UpdateDrawPile()
-        {
-            CardProspector cd;
-            //	Go	through	all	the	cards	of	the	drawPile	
-            for (int i = 0; i < drawPile.Count; i++)
-            {
-                cd = drawPile[i];
-                cd.transform.parent = layoutAnchor;
-
-                //	Position	it	correctly	with	the	layout.drawPile.stagger	
-                Vector2 dpStagger = layout.drawPile.stagger;
-                cd.transform.localPosition = new Vector3(
-                layout.multiplier.x * (layout.drawPile.x + i * dpStagger.x),
-                layout.multiplier.y * (layout.drawPile.y + i * dpStagger.y), -layout.drawPile.layerID + 0.1f * i);
-                cd.faceUp = false;  //	Make	them	all	face-down	
-                cd.state = eCardState.drawpile;
-                //	Set	depth	sorting	
-                cd.SetSortingLayerName(layout.drawPile.layerName);
-                cd.SetSortOrder(-10 * i);
+            layout.multiplier.x * (layout.drawPile.x + i * dpStagger.x),
+            layout.multiplier.y * (layout.drawPile.y + i * dpStagger.y), -layout.drawPile.layerID + 0.1f * i);
+            cd.faceUp = false;  //	Make	them	all	face-down	
+            cd.state = eCardState.drawpile;
+            //	Set	depth	sorting	
+            cd.SetSortingLayerName(layout.drawPile.layerName);
+            cd.SetSortOrder(-10 * i);
 
             cd.faceUp = false;  //	Make	them	all	face-down	
             cd.state = eCardState.drawpile;
@@ -248,9 +249,9 @@ public class Prospector : MonoBehaviour
             cd.SetSortingLayerName(layout.drawPile.layerName);
             cd.SetSortOrder(-10 * i);
         }
-        }
+    }
 
-
+    public void GetV() => SetTableauFaces();
 
     public void CardClicked(CardProspector cd)
     {
@@ -288,8 +289,7 @@ public class Prospector : MonoBehaviour
                                             //	If	we	got	here,	then:	Yay!	It's	a	valid	card.	
                 tableau.Remove(cd); //	Remove	it	from	the	tableau	List	
                 MoveToTarget(cd);   //	Make	it	the	target	card	
-                                    //	Clicking	a	card	in	the	tableau	will	check	if	it's	a	valid	play	
-                SetTableauFaces();  //	Update	tableau	card	face-ups
+                //v;          //	Update	tableau	card	face-ups
                 ScoreManager.EVENT(eScoreEvent.mine);
                 FloatingScoreHandler(eScoreEvent.mine);
                 break;
@@ -297,39 +297,39 @@ public class Prospector : MonoBehaviour
         CheckForGameOver();
         //	Test	whether	the	game	is	over	
         void CheckForGameOver()
-        { 
-                //	If	the	tableau	is	empty,	the	game	is	over	
-                if (tableau.Count == 0)
-                {
-                    //	Call	GameOver()	with	a	win	
-                    GameOver(true);
-                    return;
-                }
-                //	If	there	are	still	cards	in	the	draw	pile,	the	game's	not	over	
-                if (drawPile.Count > 0)
-                {
-                    return;
-                }
-                //	Check	for	remaining	valid	plays	
-                foreach (CardProspector cd in tableau)
-                {
-                    if (AdjacentRank(cd, target))
-                    {
-                        //	If	there	is	a	valid	play,	the	game's	not	over	
-                        return;
-                    }
-                }
-                //	Since	there	are	no	valid	plays,	the	game	is	over	
-                //	Call	GameOver	with	a	loss	
-                GameOver(false);
-            }
-            //	Called	when	the	game	is	over.	Simple	for	now,	but	expandable	
-            void GameOver(bool won)
+        {
+            //	If	the	tableau	is	empty,	the	game	is	over	
+            if (tableau.Count == 0)
             {
+                //	Call	GameOver()	with	a	win	
+                GameOver(true);
+                return;
+            }
+            //	If	there	are	still	cards	in	the	draw	pile,	the	game's	not	over	
+            if (drawPile.Count > 0)
+            {
+                return;
+            }
+            //	Check	for	remaining	valid	plays	
+            foreach (CardProspector cd in tableau)
+            {
+                if (AdjacentRank(cd, target))
+                {
+                    //	If	there	is	a	valid	play,	the	game's	not	over	
+                    return;
+                }
+            }
+            //	Since	there	are	no	valid	plays,	the	game	is	over	
+            //	Call	GameOver	with	a	loss	
+            GameOver(false);
+        }
+        //	Called	when	the	game	is	over.	Simple	for	now,	but	expandable	
+        void GameOver(bool won)
+        {
             int score = ScoreManager.SCORE;
             if (fsRun != null) score += fsRun.score;
             if (won)
-                {
+            {
                 gameOverText.text = "Round	Over";
                 roundResultText.text = "You	won	this	round!\nRound	Score:	" + score;
                 ShowResultsUI(true);
@@ -338,8 +338,8 @@ public class Prospector : MonoBehaviour
                 ScoreManager.EVENT(eScoreEvent.gameWin);
                 FloatingScoreHandler(eScoreEvent.gameWin);
             }
-                else
-                {
+            else
+            {
                 gameOverText.text = "Game	Over";
                 if (ScoreManager.HIGH_SCORE <= score)
                 {
@@ -360,14 +360,14 @@ public class Prospector : MonoBehaviour
 
             //	Reload	the	scene	in	reloadDelay	seconds	
             //	This	will	give	the	score	a	moment	to	travel	
-            Invoke("ReloadLevel", reloadDelay); 	
+            Invoke("ReloadLevel", reloadDelay);
         }
-        void ReloadLevel()
+        //void ReloadLevel()
         {
             //	Reload	the	scene,	resetting	the	game	
-            // SceneManager.LoadScene("__Prospector");
+            //SceneManager.LoadScene("__Prospector");
         }
-        }
+    }
 
     void SetTableauFaces()
     {
@@ -378,23 +378,23 @@ public class Prospector : MonoBehaviour
 
     //	Return	true	if	the	two	cards	are	adjacent	in	rank	(A	&	K	wrap	around)
     public bool AdjacentRank(CardProspector c0, CardProspector c1)
+    {
+        //	If	either	card	is	face-down,	it's	not	adjacent.	
+        if (!c0.faceUp || !c1.faceUp) return (false);
+        //	If	they	are	1	apart,	they	are	adjacent	
+        if (Mathf.Abs(c0.rank - c1.rank) == 1)
         {
-            //	If	either	card	is	face-down,	it's	not	adjacent.	
-            if (!c0.faceUp || !c1.faceUp) return (false);
-            //	If	they	are	1	apart,	they	are	adjacent	
-            if (Mathf.Abs(c0.rank - c1.rank) == 1)
-            {
-                return (true);
-            }
-            //	If	one	is	Ace	and	the	other	King,	they	are	adjacent	
-            if (c0.rank == 1 && c1.rank == 13) return (true);
-            if (c0.rank == 13 && c1.rank == 1) return (true);
-            //	Otherwise,	return	false	
-            return (false);
+            return (true);
         }
+        //	If	one	is	Ace	and	the	other	King,	they	are	adjacent	
+        if (c0.rank == 1 && c1.rank == 13) return (true);
+        if (c0.rank == 13 && c1.rank == 1) return (true);
+        //	Otherwise,	return	false	
+        return (false);
+    }
 
-   
-    
+
+
     //	Handle	FloatingScore	movement	
     void FloatingScoreHandler(eScoreEvent evt)
     {
@@ -445,6 +445,10 @@ public class Prospector : MonoBehaviour
                 break;
         }
     }
+
+    
 }
 
-
+public class v
+{
+}
