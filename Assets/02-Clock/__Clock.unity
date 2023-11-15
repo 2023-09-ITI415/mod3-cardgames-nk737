@@ -582,9 +582,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   deckXML: {fileID: 4900000, guid: c76312a0fb08948699e1abf935e4a957, type: 3}
-  layoutXML: {fileID: 4900000, guid: 61f3f05951a2f4d98b35bddbc7549908, type: 3}
-  xOffset: 3
-  yOffset: -2.5
+  layoutXML: {fileID: 4900000, guid: 07f66bc31bd53d9488058b935d71c15b, type: 3}
+  xOffset: 0
+  yOffset: 0
   layoutCenter: {x: 0, y: 0, z: 0}
   fsPosMid: {x: 0.5, y: 0.9}
   fsPosRun: {x: 0.5, y: 0.75}

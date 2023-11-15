@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Prospector : MonoBehaviour
+public class Clock : MonoBehaviour
 {
 
-    static public Prospector S;
+    static public Clock S;
 
     [Header("Set in Inspector")]
     public TextAsset deckXML;
@@ -24,11 +24,11 @@ public class Prospector : MonoBehaviour
     [Header("Set Dynamically")]
     public Deck deck;
     public Layout layout;
-    public List<CardProspector> drawPile;
+    public List<CardClock> drawPile;
     public Transform layoutAnchor;
-    public CardProspector target;
-    public List<CardProspector> tableau;
-    public List<CardProspector> discardPile;
+    public CardClock target;
+    public List<CardClock> tableau;
+    public List<CardClock> discardPile;
     public FloatingScore fsRun;
 
     public object V { get; private set; }
@@ -89,23 +89,23 @@ public class Prospector : MonoBehaviour
         drawPile = ConvertListCardsToListCardProspectors(deck.cards);
         LayoutGame();
     }
-    List<CardProspector> ConvertListCardsToListCardProspectors(List<Card>
+    List<CardClock> ConvertListCardsToListCardProspectors(List<Card>
      lCD)
     {
-        List<CardProspector> lCP = new List<CardProspector>();
-        CardProspector tCP;
+        List<CardClock> lCP = new List<CardClock>();
+        CardClock tCP;
         foreach (Card tCD in lCD)
         {
-            tCP = tCD as CardProspector;    //	a	
+            tCP = tCD as CardClock;    //	a	
             lCP.Add(tCP);
         }
         return (lCP);
     }
 
     //	The	Draw	function	will	pull	a	single	card	from	the	drawPile	andreturn	it
-    CardProspector Draw()
+    CardClock Draw()
     {
-        CardProspector cd = drawPile[0];    //	Pull	the	0th	CardProspector	
+        CardClock    cd = drawPile[0];    //	Pull	the	0th	CardProspector	
         drawPile.RemoveAt(0);   //	Then	remove	it	from	List<>	drawPile	
         return (cd);    //	And	return	it	
     }
@@ -120,7 +120,7 @@ public class Prospector : MonoBehaviour
             layoutAnchor = tGO.transform;   //	Grab	its	Transform	
             layoutAnchor.transform.position = layoutCenter; //	Position	it	
         }
-        CardProspector cp;
+        CardClock cp;
         //	Follow	the	layout	
         foreach (SlotDef tSD in layout.slotDefs)
         {
@@ -141,12 +141,12 @@ public class Prospector : MonoBehaviour
             cp.layoutID = tSD.id;
             cp.slotDef = tSD;
             //	CardProspectors	in	the	tableau	have	the	state	CardState.tableau	
-            cp.state = eCardState.tableau;
+            cp.state = eClockState.tableau;
             cp.SetSortingLayerName(tSD.layerName);
             tableau.Add(cp);    //	Add	this	CardProspector	to	the	List<>	tableau
         }
         //	Set	which	cards	are	hiding	others	
-        foreach (CardProspector tCP in tableau)
+        foreach (CardClock tCP in tableau)
         {
             foreach (int hid in tCP.slotDef.hiddenBy)
             {
@@ -162,9 +162,9 @@ public class Prospector : MonoBehaviour
 
     }
 
-    CardProspector FindCardByLayoutID(int layoutID)
+    CardClock FindCardByLayoutID(int layoutID)
     {
-        foreach (CardProspector tCP in tableau)
+        foreach (CardClock tCP in tableau)
         {
             //	Search	through	all	cards	in	the	tableau	List<>	
             if (tCP.layoutID == layoutID)
@@ -186,10 +186,10 @@ public class Prospector : MonoBehaviour
 
 
     //	Moves	the	current	target	to	the	discardPile	
-    void MoveToDiscard(CardProspector cd)
+    void MoveToDiscard(CardClock cd)
     {
         //	Set	the	state	of	the	card	to	discard	
-        cd.state = eCardState.discard;
+        cd.state = eClockState.discard;
         discardPile.Add(cd);    //	Add	it	to	the	discardPile	List<>	
         cd.transform.parent = layoutAnchor; //	Update	its	transform	parent	
                                             //	Position	this	card	on	the	discardPile	
@@ -205,12 +205,12 @@ public class Prospector : MonoBehaviour
 
 
     //	Make	cd	the	new	target	card	
-    void MoveToTarget(CardProspector cd)
+    void MoveToTarget(CardClock cd)
     {
         //	If	there	is	currently	a	target	card,	move	it	to	discardPile	
         if (target != null) MoveToDiscard(target);
         target = cd;    //	cd	is	the	new	target	
-        cd.state = eCardState.target;
+        cd.state = eClockState.target;
         cd.transform.parent = layoutAnchor;
         //	Move	to	the	target	position	
         cd.transform.localPosition = new Vector3(
@@ -225,7 +225,7 @@ public class Prospector : MonoBehaviour
     //	Arranges	all	the	cards	of	the	drawPile	to	show	how	many	are	left	
     void UpdateDrawPile()
     {
-        CardProspector cd;
+        CardClock cd;
         //	Go	through	all	the	cards	of	the	drawPile	
         for (int i = 0; i < drawPile.Count; i++)
         {
@@ -238,7 +238,7 @@ public class Prospector : MonoBehaviour
             layout.multiplier.x * (layout.drawPile.x + i * dpStagger.x),
             layout.multiplier.y * (layout.drawPile.y + i * dpStagger.y), -layout.drawPile.layerID + 0.1f * i);
             cd.faceUp = false;  //	Make	them	all	face-down	
-            cd.state = eCardState.drawpile;
+            cd.state = eClockState.drawpile;
             //	Set	depth	sorting	
             cd.SetSortingLayerName(layout.drawPile.layerName);
             cd.SetSortOrder(-10 * i);
@@ -249,17 +249,17 @@ public class Prospector : MonoBehaviour
 
     public void GetV() => SetTableauFaces();
 
-    public void CardClicked(CardProspector cd)
+    public void CardClicked(CardClock cd)
     {
         //	The	reaction	is	determined	by	the	state	of	the	clicked	card	
         switch (cd.state)
         {
-            case eCardState.target:
+            case eClockState.target:
                 //	Clicking	the	target	card	does	nothing	
                 break;
 
 
-            case eCardState.drawpile:
+            case eClockState.drawpile:
                 //	Clicking	any	card	in	the	drawPile	will	draw	the	next	card	
                 MoveToDiscard(target);  //	Moves	the	target	to	the	discardPile	
                 MoveToTarget(Draw());   //	Moves	the	next	drawn	card	to	the	target	
@@ -268,7 +268,7 @@ public class Prospector : MonoBehaviour
                 ScoreManager.EVENT(eScoreEvent.draw);
                 FloatingScoreHandler(eScoreEvent.draw);
                 break;
-            case eCardState.tableau:
+            case eClockState.tableau:
                 //	Clicking	a	card	in	the	tableau	will	check	if	it's	a	valid	play	
                 bool validMatch = true;
                 if (!cd.faceUp)
@@ -307,7 +307,7 @@ public class Prospector : MonoBehaviour
                 return;
             }
             //	Check	for	remaining	valid	plays	
-            foreach (CardProspector cd in tableau)
+            foreach (CardClock cd in tableau)
             {
                 if (AdjacentRank(cd, target))
                 {
@@ -373,7 +373,7 @@ public class Prospector : MonoBehaviour
 
 
     //	Return	true	if	the	two	cards	are	adjacent	in	rank	(A	&	K	wrap	around)
-    public bool AdjacentRank(CardProspector c0, CardProspector c1)
+    public bool AdjacentRank(   CardClock c0, CardClock c1)
     {
         //	If	either	card	is	face-down,	it's	not	adjacent.	
         if (!c0.faceUp || !c1.faceUp) return (false);
