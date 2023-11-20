@@ -1,7 +1,8 @@
-﻿using System;
+﻿
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class Prospector : MonoBehaviour
 {
@@ -162,20 +163,7 @@ public class Prospector : MonoBehaviour
 
     }
 
-    CardProspector FindCardByLayoutID(int layoutID)
-    {
-        foreach (CardProspector tCP in tableau)
-        {
-            //	Search	through	all	cards	in	the	tableau	List<>	
-            if (tCP.layoutID == layoutID)
-            {
-                //	If	the	card	has	the	same	ID,	return	it	
-                return (tCP);
-            }
-        }
-        //	If	it's	not	found,	return	null	
-        return (null);
-    }
+   
 
 
 
@@ -243,11 +231,11 @@ public class Prospector : MonoBehaviour
             cd.SetSortingLayerName(layout.drawPile.layerName);
             cd.SetSortOrder(-10 * i);
 
-            
+
         }
     }
 
-    public void GetV() => SetTableauFaces();
+   
 
     public void CardClicked(CardProspector cd)
     {
@@ -361,14 +349,13 @@ public class Prospector : MonoBehaviour
         //void ReloadLevel()
         {
             //	Reload	the	scene,	resetting	the	game	
-            //SceneManager.LoadScene("__Prospector");
+            // SceneManager.LoadScene("__Prospector");
         }
     }
 
-    void SetTableauFaces()
-    {
-        throw new NotImplementedException();
-    }
+   
+
+
 
 
 
@@ -442,6 +429,40 @@ public class Prospector : MonoBehaviour
         }
     }
 
-    
+    // Convert from the layoutID int to the CardProspector with that ID
+    CardProspector FindCardByLayoutID(int layoutID)
+    {
+        foreach (CardProspector tCP in tableau)
+        {
+            // Search through all cards in the tableau List<>
+            if (tCP.layoutID == layoutID)
+            {
+                // If the card has the same ID, return it
+                return (tCP);
+            }
+        }
+        // If it's not found, return null
+        return (null);
+    }
+
+    // This turns cards in the Mine face-up or face-down
+    void SetTableauFaces()
+    {
+        foreach (CardProspector cd in tableau)
+        {
+            bool faceUp = true; // Assume the card will be face-up
+            foreach (CardProspector cover in cd.hiddenBy)
+            {
+                // If either of the covering cards are in the tableau
+                if (cover.state == eCardState.tableau)
+                {
+                    faceUp = false; // then this card is face-down
+                }
+            }
+            cd.faceUp = faceUp; // Set the value on the card
+        }
+
+
+    }
 }
 
